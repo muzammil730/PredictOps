@@ -9,8 +9,6 @@ __pycache__/
 data/processed_train.csv
 data/features_train.csv
 
-# Trained models
-models/
 
 # Jupyter
 .ipynb_checkpoints/
