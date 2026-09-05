@@ -18,3 +18,10 @@ data/features_train.csv
 
 # VS Code
 .vscode/
+
+# MLflow
+mlflow.db
+mlruns/
+
+# Trained models
+models/

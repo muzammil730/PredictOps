@@ -1,6 +1,8 @@
 import pandas as pd
 import numpy as np
 import joblib
+import mlflow
+import mlflow.sklearn
 
 from pathlib import Path
 from sklearn.model_selection import train_test_split
@@ -12,6 +14,10 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 DATA_PATH = PROJECT_ROOT / "data" / "features_train.csv"
 MODEL_PATH = PROJECT_ROOT / "models" / "rul_model.pkl"
+
+
+# MLflow experiment
+mlflow.set_experiment("PredictOps-RUL")
 
 
 # Load engineered dataset
@@ -45,44 +51,79 @@ print("\nTraining samples:", X_train.shape)
 print("Testing samples:", X_test.shape)
 
 
-# Create Random Forest model
-model = RandomForestRegressor(
-    n_estimators=200,
-    random_state=42,
-    n_jobs=-1
-)
+# Model parameters
+n_estimators = 200
+random_state = 42
 
 
-# Train model
-print("\nTraining Random Forest model...")
-model.fit(X_train, y_train)
+# Start MLflow run
+with mlflow.start_run():
 
-print("Training completed.")
+    # Create Random Forest model
+    model = RandomForestRegressor(
+        n_estimators=n_estimators,
+        random_state=random_state,
+        n_jobs=-1
+    )
 
+    # Train model
+    print("\nTraining Random Forest model...")
+    model.fit(X_train, y_train)
 
-# Make predictions
-y_pred = model.predict(X_test)
-
-
-# Evaluate model
-mae = mean_absolute_error(y_test, y_pred)
-mse = mean_squared_error(y_test, y_pred)
-rmse = np.sqrt(mse)
-r2 = r2_score(y_test, y_pred)
-
-
-print("\n===== Model Evaluation =====")
-print(f"MAE  : {mae:.4f}")
-print(f"MSE  : {mse:.4f}")
-print(f"RMSE : {rmse:.4f}")
-print(f"R²   : {r2:.4f}")
+    print("Training completed.")
 
 
-# Create models directory if it doesn't exist
-MODEL_PATH.parent.mkdir(parents=True, exist_ok=True)
+    # Make predictions
+    y_pred = model.predict(X_test)
 
 
-# Save trained model
-joblib.dump(model, MODEL_PATH)
+    # Evaluate model
+    mae = mean_absolute_error(y_test, y_pred)
+    mse = mean_squared_error(y_test, y_pred)
+    rmse = np.sqrt(mse)
+    r2 = r2_score(y_test, y_pred)
 
-print(f"\nModel saved successfully at: {MODEL_PATH}")
+
+    # Print evaluation
+    print("\n===== Model Evaluation =====")
+    print(f"MAE  : {mae:.4f}")
+    print(f"MSE  : {mse:.4f}")
+    print(f"RMSE : {rmse:.4f}")
+    print(f"R²   : {r2:.4f}")
+
+
+    # Log parameters to MLflow
+    mlflow.log_params({
+        "model_type": "RandomForestRegressor",
+        "n_estimators": n_estimators,
+        "random_state": random_state,
+        "test_size": 0.2
+    })
+
+
+    # Log metrics to MLflow
+    mlflow.log_metrics({
+        "mae": mae,
+        "mse": mse,
+        "rmse": rmse,
+        "r2": r2
+    })
+
+
+    # Create models directory
+    MODEL_PATH.parent.mkdir(parents=True, exist_ok=True)
+
+
+    # Save model locally
+    joblib.dump(model, MODEL_PATH)
+
+    print(f"\nModel saved successfully at: {MODEL_PATH}")
+
+
+    # Log trained model to MLflow
+    mlflow.sklearn.log_model(
+        model,
+        name="rul_random_forest"
+    )
+
+    print("Model logged successfully to MLflow.")
