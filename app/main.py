@@ -18,18 +18,61 @@ DATA_PATH = PROJECT_ROOT / "data" / "features_train.csv"
 
 
 # --------------------------------------------------
-# Load model and feature schema
+# Model and feature schema
 # --------------------------------------------------
 
-model = joblib.load(MODEL_PATH)
-
-df = pd.read_csv(DATA_PATH)
-
-TARGET_COLUMN = "RUL"
+model = None
 
 FEATURE_COLUMNS = [
-    column for column in df.columns
-    if column != TARGET_COLUMN
+    "unit",
+    "cycle",
+    "setting_1",
+    "setting_2",
+    "sensor_2",
+    "sensor_3",
+    "sensor_4",
+    "sensor_6",
+    "sensor_7",
+    "sensor_8",
+    "sensor_9",
+    "sensor_11",
+    "sensor_12",
+    "sensor_13",
+    "sensor_14",
+    "sensor_15",
+    "sensor_17",
+    "sensor_20",
+    "sensor_21",
+    "sensor_2_rolling_mean",
+    "sensor_2_rolling_std",
+    "sensor_3_rolling_mean",
+    "sensor_3_rolling_std",
+    "sensor_4_rolling_mean",
+    "sensor_4_rolling_std",
+    "sensor_6_rolling_mean",
+    "sensor_6_rolling_std",
+    "sensor_7_rolling_mean",
+    "sensor_7_rolling_std",
+    "sensor_8_rolling_mean",
+    "sensor_8_rolling_std",
+    "sensor_9_rolling_mean",
+    "sensor_9_rolling_std",
+    "sensor_11_rolling_mean",
+    "sensor_11_rolling_std",
+    "sensor_12_rolling_mean",
+    "sensor_12_rolling_std",
+    "sensor_13_rolling_mean",
+    "sensor_13_rolling_std",
+    "sensor_14_rolling_mean",
+    "sensor_14_rolling_std",
+    "sensor_15_rolling_mean",
+    "sensor_15_rolling_std",
+    "sensor_17_rolling_mean",
+    "sensor_17_rolling_std",
+    "sensor_20_rolling_mean",
+    "sensor_20_rolling_std",
+    "sensor_21_rolling_mean",
+    "sensor_21_rolling_std",
 ]
 
 
@@ -71,6 +114,8 @@ def health_check():
 @app.post("/predict")
 def predict_rul(request: PredictionRequest):
 
+    global model
+
     # Check for missing features
     missing_features = [
         feature
@@ -103,7 +148,17 @@ def predict_rul(request: PredictionRequest):
             }
         )
 
-    # Create input DataFrame in the exact training order
+    # Load model only when prediction is requested
+    if model is None:
+        if not MODEL_PATH.exists():
+            raise HTTPException(
+                status_code=503,
+                detail="Model file is not available"
+            )
+
+        model = joblib.load(MODEL_PATH)
+
+    # Create input DataFrame in exact training order
     input_data = pd.DataFrame(
         [[request.features[feature] for feature in FEATURE_COLUMNS]],
         columns=FEATURE_COLUMNS
