@@ -1,10 +1,13 @@
 from pathlib import Path
 from typing import Dict
+import time
 
 import joblib
 import pandas as pd
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import Response
 from pydantic import BaseModel
+from prometheus_client import Counter, Histogram, generate_latest
 
 
 # --------------------------------------------------
@@ -88,6 +91,62 @@ app = FastAPI(
 
 
 # --------------------------------------------------
+# Prometheus metrics
+# --------------------------------------------------
+
+REQUEST_COUNT = Counter(
+    "predictops_http_requests_total",
+    "Total number of HTTP requests",
+    ["method", "endpoint", "status"]
+)
+
+REQUEST_LATENCY = Histogram(
+    "predictops_http_request_duration_seconds",
+    "HTTP request latency in seconds",
+    ["method", "endpoint"]
+)
+
+
+# --------------------------------------------------
+# Monitoring middleware
+# --------------------------------------------------
+
+@app.middleware("http")
+async def monitoring_middleware(request: Request, call_next):
+
+    start_time = time.time()
+
+    try:
+        response = await call_next(request)
+
+        status_code = response.status_code
+
+        return response
+
+    except Exception:
+        status_code = 500
+        raise
+
+    finally:
+        duration = time.time() - start_time
+        endpoint = request.url.path
+
+        # Don't record the metrics endpoint itself
+        if endpoint != "/metrics":
+
+            REQUEST_COUNT.labels(
+                method=request.method,
+                endpoint=endpoint,
+                status=status_code
+            ).inc()
+
+            REQUEST_LATENCY.labels(
+                method=request.method,
+                endpoint=endpoint
+            ).observe(duration)
+
+
+# --------------------------------------------------
 # Request schema
 # --------------------------------------------------
 
@@ -150,6 +209,7 @@ def predict_rul(request: PredictionRequest):
 
     # Load model only when prediction is requested
     if model is None:
+
         if not MODEL_PATH.exists():
             raise HTTPException(
                 status_code=503,
@@ -174,3 +234,16 @@ def predict_rul(request: PredictionRequest):
         "unit": "cycles",
         "model": "RUL prediction model"
     }
+
+
+# --------------------------------------------------
+# Prometheus metrics endpoint
+# --------------------------------------------------
+
+@app.get("/metrics")
+def metrics():
+
+    return Response(
+        content=generate_latest(),
+        media_type="text/plain"
+    )
