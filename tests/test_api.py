@@ -1,7 +1,9 @@
 from fastapi.testclient import TestClient
-from app.main import app
 
-client = TestClient(app)
+from app import main
+
+
+client = TestClient(main.app)
 
 
 def test_health():
@@ -11,7 +13,16 @@ def test_health():
     assert response.json()["status"] == "healthy"
 
 
-def test_predict():
+class FakeModel:
+    def predict(self, data):
+        return [100.0]
+
+
+def test_predict(monkeypatch):
+
+    # Use a fake model so CI does not need the real 248 MB model file
+    monkeypatch.setattr(main, "model", FakeModel())
+
     response = client.post(
         "/predict",
         json={
@@ -71,3 +82,4 @@ def test_predict():
 
     assert response.status_code == 200
     assert "predicted_rul_cycles" in response.json()
+    assert response.json()["predicted_rul_cycles"] == 100.0
