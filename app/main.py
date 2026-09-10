@@ -8,6 +8,7 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import Response
 from pydantic import BaseModel
 from prometheus_client import Counter, Histogram, generate_latest
+from prometheus_client import Gauge
 
 
 # --------------------------------------------------
@@ -247,3 +248,10 @@ def metrics():
         content=generate_latest(),
         media_type="text/plain"
     )
+
+drift_percentage_metric = Gauge(
+    "predictops_data_drift_percentage",
+    "Percentage of features showing data drift"
+)
+
+drift_percentage_metric.set(4.08)
