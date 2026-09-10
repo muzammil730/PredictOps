@@ -255,4 +255,8 @@ drift_percentage_metric = Gauge(
     "Percentage of features showing data drift"
 )
 
-drift_percentage_metric.set(calculate_drift_percentage())
+if DATA_PATH.exists():
+    drift_percentage_metric.set(calculate_drift_percentage())
+else:
+    # CI/test environment may not contain the training dataset
+    drift_percentage_metric.set(0.0)
