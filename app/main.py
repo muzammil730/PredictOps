@@ -9,6 +9,7 @@ from fastapi.responses import Response
 from pydantic import BaseModel
 from prometheus_client import Counter, Histogram, generate_latest
 from prometheus_client import Gauge
+from src.drift_detection import calculate_drift_percentage
 
 
 # --------------------------------------------------
@@ -254,4 +255,4 @@ drift_percentage_metric = Gauge(
     "Percentage of features showing data drift"
 )
 
-drift_percentage_metric.set(4.08)
+drift_percentage_metric.set(calculate_drift_percentage())
