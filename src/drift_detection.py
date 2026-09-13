@@ -1,8 +1,10 @@
 import pandas as pd
 from scipy.stats import ks_2samp
 
-REFERENCE_DATA = "data/features_train.csv"
+from pathlib import Path
 
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+REFERENCE_DATA = PROJECT_ROOT / "data" / "features_train.csv"
 
 def calculate_drift_percentage():
     reference = pd.read_csv(REFERENCE_DATA)
