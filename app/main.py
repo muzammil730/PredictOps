@@ -260,3 +260,16 @@ if DATA_PATH.exists():
 else:
     # CI/test environment may not contain the training dataset
     drift_percentage_metric.set(0.0)
+
+# --------------------------------------------------
+# SageMaker required endpoints
+# --------------------------------------------------
+
+@app.get("/ping")
+def ping():
+    return Response(status_code=200)
+
+
+@app.post("/invocations")
+def invocations(request: PredictionRequest):
+    return predict_rul(request)

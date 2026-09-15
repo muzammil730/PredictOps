@@ -11,6 +11,9 @@ COPY src/ src/
 COPY models/ models/
 COPY data/ data/
 
-EXPOSE 8000
+COPY serve /usr/local/bin/serve
+RUN chmod +x /usr/local/bin/serve
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+EXPOSE 8080
+
+ENTRYPOINT ["/usr/local/bin/serve"]

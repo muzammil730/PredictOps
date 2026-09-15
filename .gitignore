@@ -25,3 +25,11 @@ mlruns/
 
 # Trained models
 models/
+
+
+
+# Terraform
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
