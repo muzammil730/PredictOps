@@ -5,20 +5,12 @@ An end-to-end MLOps project that predicts the **Remaining Useful Life (RUL)** of
 ## Architecture
 
 Sensor data (NASA C-MAPSS FD001)
-│
-▼
-Feature engineering (rolling stats)
-│
-▼
-RandomForestRegressor (RUL prediction)
-│
-▼
-FastAPI ──────────────┬──────────────┐
-│ │ │
-▼ ▼ ▼
-Dashboard Prometheus AWS SageMaker
-(HTML/CSS/JS) + Grafana Serverless
-(via Docker + ECR)
+-> Feature engineering (rolling stats)
+-> RandomForestRegressor (RUL prediction)
+-> FastAPI
+   -> Dashboard (HTML/CSS/JS)
+   -> Prometheus + Grafana
+   -> AWS SageMaker Serverless (via Docker + ECR)
 
 Infrastructure: Terraform
 CI/CD: GitHub Actions (tests, Terraform plan/apply, scheduled retraining)
@@ -118,13 +110,13 @@ terraform apply
 ## Project structure
 
 PredictOps/
-├── app/ # FastAPI application
-├── src/ # Data pipeline: preprocessing, feature engineering, training, drift detection
-├── frontend/ # Dashboard (HTML/CSS/JS)
-├── terraform/ # AWS infrastructure (ECR, IAM, SageMaker)
-├── data/ # Raw C-MAPSS data (generated CSVs are gitignored)
-├── models/ # Trained model artifact (gitignored)
-├── tests/ # Test suite
-├── .github/workflows/ # CI, Terraform CI, scheduled retraining
-├── Dockerfile
-└── prometheus.yml
+  app/                  # FastAPI application
+  src/                  # Data pipeline: preprocessing, feature engineering, training, drift detection
+  frontend/             # Dashboard (HTML/CSS/JS)
+  terraform/            # AWS infrastructure (ECR, IAM, SageMaker)
+  data/                 # Raw C-MAPSS data (generated CSVs are gitignored)
+  models/               # Trained model artifact (gitignored)
+  tests/                # Test suite
+  .github/workflows/    # CI, Terraform CI, scheduled retraining
+  Dockerfile
+  prometheus.yml
