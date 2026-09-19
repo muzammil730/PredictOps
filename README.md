@@ -4,8 +4,6 @@ An end-to-end MLOps project that predicts the **Remaining Useful Life (RUL)** of
 
 ## Architecture
 
-## Architecture
-
 ```mermaid
 flowchart TD
     A[Sensor data<br/>NASA C-MAPSS FD001] --> B[Feature engineering<br/>rolling stats]
