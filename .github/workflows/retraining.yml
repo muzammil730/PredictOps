@@ -23,6 +23,11 @@ jobs:
           pip install -r requirements.txt
           pip install mlflow
 
+      - name: Build training dataset
+        run: |
+          python src/preprocess.py
+          python src/feature_engineering.py
+
       - name: Check data drift
         run: python src/drift_detection.py
 
