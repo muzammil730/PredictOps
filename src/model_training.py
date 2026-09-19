@@ -122,9 +122,10 @@ with mlflow.start_run():
 
     # Log trained model to MLflow
     mlflow.sklearn.log_model(
-    model,
-    name="rul_random_forest",
-    registered_model_name="PredictOps-RUL-Model"
-)
+        model,
+        name="rul_random_forest",
+        registered_model_name="PredictOps-RUL-Model",
+        serialization_format="pickle"
+    )
 
     print("Model logged successfully to MLflow.")
