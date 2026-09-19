@@ -12,7 +12,7 @@ resource "aws_sagemaker_model" "predictops" {
 }
 
 resource "aws_sagemaker_endpoint_configuration" "predictops" {
-  name = "${var.project_name}-rul-endpoint-config"
+  name = "${var.project_name}-rul-endpoint-config-${substr(md5(var.docker_image_uri), 0, 8)}"
 
   production_variants {
     variant_name = "PredictOpsVariant"

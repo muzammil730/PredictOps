@@ -39,6 +39,11 @@ df["RUL"] = df.apply(
     axis=1
 )
 
+# Cap RUL at 125 (standard C-MAPSS practice). Early-life degradation
+# isn't observable in the sensors, so treating raw high RUL values
+# as a linear target just adds noise the model can't actually learn from.
+df["RUL"] = df["RUL"].clip(upper=125)
+
 
 # Remove columns with no useful variation
 constant_columns = [

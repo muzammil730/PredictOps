@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>PredictOps | Predictive Maintenance</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <!-- ================= SIDEBAR ================= -->
+
+    <aside class="sidebar">
+
+        <div class="logo">
+            <div class="logo-icon">P</div>
+
+            <div>
+                <h2>PredictOps</h2>
+                <span>Predictive Maintenance</span>
+            </div>
+        </div>
+
+        <nav>
+
+            <a href="#" class="active">
+                <span>▣</span>
+                Dashboard
+            </a>
+
+            <a href="#machines">
+                <span>⚙</span>
+                Machines
+            </a>
+
+            <a href="#prediction">
+                <span>◈</span>
+                Predictions
+            </a>
+
+            <a href="#monitoring">
+                <span>◉</span>
+                Monitoring
+            </a>
+
+        </nav>
+
+        <div class="sidebar-bottom">
+
+            <div class="aws-status">
+                <span class="status-dot"></span>
+                <span id="connectionStatus">
+                    Checking API...
+                </span>
+            </div>
+
+            <small>
+                FastAPI • SageMaker Serverless
+            </small>
+
+        </div>
+
+    </aside>
+
+
+    <!-- ================= MAIN ================= -->
+
+    <main class="main">
+
+        <!-- HEADER -->
+
+        <header class="topbar">
+
+            <div>
+
+                <p class="eyebrow">
+                    INDUSTRIAL AI PLATFORM
+                </p>
+
+                <h1>
+                    Predictive Maintenance Dashboard
+                </h1>
+
+                <p class="subtitle">
+                    Monitor machine health and predict remaining useful life.
+                </p>
+
+            </div>
+
+            <div class="header-status">
+
+                <span
+                    class="status-dot"
+                    id="systemDot">
+                </span>
+
+                <span id="systemStatus">
+                    Checking System
+                </span>
+
+            </div>
+
+        </header>
+
+
+        <!-- ================= SUMMARY CARDS ================= -->
+
+        <section class="summary-grid">
+
+            <div class="summary-card">
+
+                <div class="card-label">
+                    Machines Monitored
+                </div>
+
+                <div
+                    class="card-value"
+                    id="machineCount">
+                    —
+                </div>
+
+                <div class="card-info">
+                    Industrial assets
+                </div>
+
+            </div>
+
+
+            <div class="summary-card">
+
+                <div class="card-label">
+                    Healthy Machines
+                </div>
+
+                <div
+                    class="card-value green"
+                    id="healthyCount">
+                    —
+                </div>
+
+                <div
+                    class="card-info"
+                    id="healthyPercentage">
+                    Calculating...
+                </div>
+
+            </div>
+
+
+            <div class="summary-card">
+
+                <div class="card-label">
+                    Maintenance Required
+                </div>
+
+                <div
+                    class="card-value orange"
+                    id="maintenanceCount">
+                    —
+                </div>
+
+                <div class="card-info">
+                    Requires attention
+                </div>
+
+            </div>
+
+
+            <div class="summary-card">
+
+                <div class="card-label">
+                    ML Endpoint
+                </div>
+
+                <div
+                    class="card-value online"
+                    id="endpointStatus">
+                    CHECKING
+                </div>
+
+                <div class="card-info">
+                    RUL prediction service
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= DASHBOARD ================= -->
+
+        <section
+            class="dashboard-grid"
+            id="prediction">
+
+
+            <!-- PREDICTION PANEL -->
+
+            <div class="panel prediction-panel">
+
+                <div class="panel-header">
+
+                    <div>
+
+                        <h2>
+                            RUL Prediction
+                        </h2>
+
+                        <p>
+                            Select a machine to run the ML model
+                        </p>
+
+                    </div>
+
+                    <span class="badge">
+                        RANDOM FOREST
+                    </span>
+
+                </div>
+
+
+                <form id="predictionForm">
+
+                    <div class="input-grid">
+
+
+                        <!-- MACHINE -->
+
+                        <div class="input-group full-width">
+
+                            <label>
+                                Machine ID
+                            </label>
+
+                            <select id="machineId">
+
+                                <option value="">
+                                    Select Machine
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- MACHINE INFO -->
+
+                        <div class="machine-info-box">
+
+                            <span class="info-icon">
+                                ⚙
+                            </span>
+
+                            <div>
+
+                                <strong>
+                                    Automatic Feature Engineering
+                                </strong>
+
+                                <p>
+                                    70+ engineered sensor features will
+                                    be generated automatically by the backend.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <button
+                        type="submit"
+                        class="predict-button">
+
+                        <span>⚡</span>
+
+                        Predict Remaining Useful Life
+
+                    </button>
+
+                </form>
+
+            </div>
+
+
+            <!-- RESULT PANEL -->
+
+            <div class="panel result-panel">
+
+                <div class="panel-header">
+
+                    <div>
+
+                        <h2>
+                            Prediction Result
+                        </h2>
+
+                        <p>
+                            Latest model inference
+                        </p>
+
+                    </div>
+
+                    <span
+                        class="result-live"
+                        id="resultLive">
+                        READY
+                    </span>
+
+                </div>
+
+
+                <div
+                    id="resultContent"
+                    class="result-content">
+
+
+                    <div class="result-placeholder">
+
+                        <div class="placeholder-icon">
+                            🤖
+                        </div>
+
+                        <h3>
+                            Ready for Prediction
+                        </h3>
+
+                        <p>
+                            Select a machine and run the ML model
+                            to estimate its remaining useful life.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= MACHINE HEALTH ================= -->
+
+        <section
+            class="panel machine-panel"
+            id="machines">
+
+            <div class="panel-header">
+
+                <div>
+
+                    <h2>
+                        Machine Health Overview
+                    </h2>
+
+                    <p>
+                        Live machine data from PredictOps backend
+                    </p>
+
+                </div>
+
+                <button
+                    class="secondary-button"
+                    id="refreshMachines">
+
+                    ↻ Refresh
+
+                </button>
+
+            </div>
+
+
+            <div class="machine-table">
+
+                <div class="table-row table-heading">
+
+                    <span>
+                        Machine
+                    </span>
+
+                    <span>
+                        Latest Cycle
+                    </span>
+
+                    <span>
+                        Temperature
+                    </span>
+
+                    <span>
+                        Health
+                    </span>
+
+                    <span>
+                        RUL
+                    </span>
+
+                </div>
+
+
+                <div id="machineRows">
+
+                    <div class="table-loading">
+
+                        Loading machine data...
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= MONITORING ================= -->
+
+        <section
+            class="monitoring-grid"
+            id="monitoring">
+
+
+            <div class="panel monitoring-card">
+
+                <div class="monitor-icon">
+                    ◉
+                </div>
+
+                <div>
+
+                    <h3>
+                        API Monitoring
+                    </h3>
+
+                    <p>
+                        FastAPI request monitoring enabled
+                    </p>
+
+                </div>
+
+                <span class="monitor-status">
+                    ACTIVE
+                </span>
+
+            </div>
+
+
+            <div class="panel monitoring-card">
+
+                <div class="monitor-icon">
+                    ◈
+                </div>
+
+                <div>
+
+                    <h3>
+                        ML Monitoring
+                    </h3>
+
+                    <p>
+                        RUL prediction pipeline
+                    </p>
+
+                </div>
+
+                <span class="monitor-status">
+                    ACTIVE
+                </span>
+
+            </div>
+
+
+            <div class="panel monitoring-card">
+
+                <div class="monitor-icon">
+                    ◇
+                </div>
+
+                <div>
+
+                    <h3>
+                        Data Drift
+                    </h3>
+
+                    <p>
+                        Feature distribution monitoring
+                    </p>
+
+                </div>
+
+                <span
+                    class="monitor-status"
+                    id="driftStatus">
+                    CHECKING
+                </span>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= FOOTER ================= -->
+
+        <footer>
+
+            <span>
+                PredictOps
+            </span>
+
+            <span>•</span>
+
+            <span>
+                Random Forest RUL Model
+            </span>
+
+            <span>•</span>
+
+            <span>
+                AWS SageMaker Serverless
+            </span>
+
+        </footer>
+
+    </main>
+
+
+    <script src="script.js"></script>
+
+</body>
+</html>

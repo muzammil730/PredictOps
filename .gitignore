@@ -33,3 +33,6 @@ models/
 *.tfstate
 *.tfstate.*
 *.tfvars
+
+data/processed_test.csv
+data/features_test.csv
