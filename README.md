@@ -4,17 +4,24 @@ An end-to-end MLOps project that predicts the **Remaining Useful Life (RUL)** of
 
 ## Architecture
 
-Sensor data (NASA C-MAPSS FD001)
--> Feature engineering (rolling stats)
--> RandomForestRegressor (RUL prediction)
--> FastAPI
-   -> Dashboard (HTML/CSS/JS)
-   -> Prometheus + Grafana
-   -> AWS SageMaker Serverless (via Docker + ECR)
+## Architecture
 
-Infrastructure: Terraform
-CI/CD: GitHub Actions (tests, Terraform plan/apply, scheduled retraining)
+```mermaid
+flowchart TD
+    A[Sensor data<br/>NASA C-MAPSS FD001] --> B[Feature engineering<br/>rolling stats]
+    B --> C[RandomForestRegressor<br/>RUL prediction]
+    C --> D[FastAPI]
+    D --> E[Dashboard<br/>HTML/CSS/JS]
+    D --> F[Prometheus]
+    D --> G[AWS SageMaker Serverless<br/>via Docker + ECR]
+    F --> H[Grafana]
 
+    I[Terraform] -.provisions.-> G
+    J[GitHub Actions] -.tests, deploys,\nscheduled retraining.-> D
+```
+
+**Infrastructure:** Terraform (ECR, IAM, SageMaker)
+**CI/CD:** GitHub Actions — test suite, Terraform plan/apply, scheduled model retraining
 
 ## Tech stack
 
@@ -109,14 +116,16 @@ terraform apply
 
 ## Project structure
 
-PredictOps/
-  app/                  # FastAPI application
-  src/                  # Data pipeline: preprocessing, feature engineering, training, drift detection
-  frontend/             # Dashboard (HTML/CSS/JS)
-  terraform/            # AWS infrastructure (ECR, IAM, SageMaker)
-  data/                 # Raw C-MAPSS data (generated CSVs are gitignored)
-  models/               # Trained model artifact (gitignored)
-  tests/                # Test suite
-  .github/workflows/    # CI, Terraform CI, scheduled retraining
-  Dockerfile
-  prometheus.yml
+```mermaid
+flowchart LR
+    Root[PredictOps/] --> App[app/<br/>FastAPI application]
+    Root --> Src[src/<br/>preprocessing, feature<br/>engineering, training,<br/>drift detection]
+    Root --> Frontend[frontend/<br/>Dashboard HTML/CSS/JS]
+    Root --> Terraform[terraform/<br/>AWS infra: ECR, IAM,<br/>SageMaker]
+    Root --> Data[data/<br/>Raw C-MAPSS data<br/>generated CSVs gitignored]
+    Root --> Models[models/<br/>Trained model artifact<br/>gitignored]
+    Root --> Tests[tests/<br/>Test suite]
+    Root --> Workflows[.github/workflows/<br/>CI, Terraform CI,<br/>scheduled retraining]
+    Root --> Docker[Dockerfile]
+    Root --> Prom[prometheus.yml]
+```
